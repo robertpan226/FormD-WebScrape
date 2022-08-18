@@ -4,21 +4,34 @@ URL = "https://formdworks.com/"
 
 req = requests.get(URL + "/products.json").json()
 
-availableProducts = {}
-SKUs = {}
+allProducts = {}
+SKU_Availability = {}
+test = {}
 
 for product in req["products"]:
     if (product["title"] != "Shipping Adjustment" and product["title"] != "Manuals + Guides"):
+        test[product["title"]] = {}
         for variant in product["variants"]:
             current = None
             if (variant["title"] == "Default Title"):
-                availableProducts[product["title"]] = variant["available"]
+                allProducts[product["title"]] = variant["sku"]
                 current = product["title"]
+                SKU_Availability[variant["sku"]] = variant["available"]
+                test[product["title"]][variant["option1"]] = { 
+                    variant["option2"]: {
+                        variant["option3"]: variant["available"]
+                    }
+                }
             else:
-                availableProducts[product["title"] + " " + variant["title"]] = variant["available"]
+                allProducts[product["title"] + " " + variant["title"]] = variant["sku"]
                 current = product["title"] + " " + variant["title"]
+                SKU_Availability[variant["sku"]] = variant["available"]
+                test[product["title"]][variant["option1"]] = { 
+                    variant["option2"]: {
+                        variant["option3"]: variant["available"]
+                    }
+                }
             
-            SKUs[current] = variant["sku"]
+            SKU_Availability[current] = variant["sku"]
 
-for i in SKUs:
-    print(i, SKUs[i])
+print(SKU_Availability)
